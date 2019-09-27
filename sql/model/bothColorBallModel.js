@@ -9,7 +9,7 @@ const bothColorBallSchema = new mongoose.Schema({
   secondPrize: String,
   allBallCount: Number,
   allBallAverage: String,
-  redBAllAverage: String,
+  redBallAverage: String,
   redBallCount: Number,
   allRedBallQuantity: Number,
   allBallQuantity:Number

@@ -3,8 +3,7 @@ const mongoose = require('mongoose');
 const cheerio = require('cheerio');
 const iconv = require('iconv-lite');
 const { BothColorBallModel } = require('./sql/index');
-
-const updateBallLocationAPi = 'http://kaijiang.zhcw.com/zhcw/html/ssq/list_1.html';
+const updateBallLocationAPi = 'http://kaijiang.zhcw.com/zhcw/html/ssq/list.html';
 mongoose.connect('mongodb://106.53.76.34/qinpeipei', {useNewUrlParser:true});
 
 const db = mongoose.connection;
@@ -42,26 +41,21 @@ function saveNewData() {
     obj.allBallCount = allBallCount;
     obj.redBallCount = redBallCount;
 
-    BothColorBallModel.find().countDocuments().exec((err, length) => {
+    BothColorBallModel.find({issueNumber: {$lt: obj.issueNumber}}).countDocuments().exec((err, length) => {
       BothColorBallModel.find({issueNumber: obj.issueNumber - 1}, (err, data) => {
         obj.allBallQuantity = data[0].allBallQuantity + obj.allBallCount;
         obj.allRedBallQuantity = data[0].allRedBallQuantity + obj.redBallCount;
         obj.redBallAverage = obj.allRedBallQuantity / (length + 1);
         obj.allBallAverage = obj.allBallQuantity / (length + 1);
         const saveData = new BothColorBallModel(obj);
-        BothColorBallModel.find({issueNumber: obj.issueNumber}, (err, data) => {
-          if (data.length <= 0) {
-            saveData.save((err, data) => {
-              if (err) {
-                console.log(`save error`, err);
-                return;
-              }
-              console.log(`save successful: `, data);
-              process.exit();
-            })
-          } else {
-            process.exit()
+        
+        BothColorBallModel.findOneAndUpdate({issueNumber: obj.issueNumber}, {$set: obj}, {upsert: true, new: true}, (err, data) => {
+          if (err) {
+            console.log('updateError: ', err);
+            return;
           }
+          console.log('update success: ', data);
+          process.exit();
         })
       })
     });

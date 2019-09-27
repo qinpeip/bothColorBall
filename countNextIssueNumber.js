@@ -25,7 +25,6 @@ function getCombinations (num) {
               const str = `${oneNum},${twoNum},${threeNum},${fourNum},${fivNum},${sixNum}`;
               if (count == num) {
                 combinations.includes(str) || combinations.push(str);
-                console.log('当前组合数量:', combinations.length);
               }
             })
           })
@@ -35,4 +34,9 @@ function getCombinations (num) {
   })
   return combinations;
 }
-fs.writeFileSync('ball.txt', JSON.stringify(getCombinations(122)));
+
+module.exports = {
+  getCombinations
+}
+
+// fs.writeFileSync('ball.txt', JSON.stringify(getCombinations(124)));
